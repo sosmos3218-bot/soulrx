@@ -20,9 +20,44 @@ const serif = Noto_Serif_KR({
   weight: ["400", "600", "700"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+  "https://soulrx.vercel.app";
+
+const title = "SoulRx — 감정 → 상황 → 말씀 처방";
+const description =
+  "오늘 마음에 맞는 말씀 처방. 감정과 상황을 고르면 구절·묵상·기도가 따라옵니다. 점술·운세가 아닌, 조용한 그리스도인 자기 성찰 큐티.";
+
 export const metadata: Metadata = {
-  title: "SoulRx — 말씀 처방",
-  description: "오늘 기분에 맞는 말씀 처방. 조용한 큐티, 운세가 아닙니다.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: title,
+    template: "%s · SoulRx",
+  },
+  description,
+  applicationName: "SoulRx",
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    url: siteUrl,
+    siteName: "SoulRx",
+    title,
+    description,
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "SoulRx — 감정 → 상황 → 말씀 처방",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/og.png"],
+  },
 };
 
 export const viewport: Viewport = {

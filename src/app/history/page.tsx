@@ -9,6 +9,7 @@ import { formatKoreanDate } from "@/lib/date";
 import { computeWeeklyInsight } from "@/lib/insights";
 import { Chip } from "@/components/Chip";
 import { SyncPrompt } from "@/components/SyncPrompt";
+import { DailyReminder } from "@/components/DailyReminder";
 
 export default function HistoryPage() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -44,6 +45,10 @@ export default function HistoryPage() {
       </header>
 
       <SyncPrompt />
+
+      <div className="mb-5">
+        <DailyReminder compact />
+      </div>
 
       {entries === null ? (
         <p className="text-center text-sm text-stone-400">불러오는 중…</p>
