@@ -8,8 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Write public/og.png from scripts/og-parts
-        run: node scripts/write-og-png.mjs
+      - name: Fetch public/og.png from production
+        run: |
+          mkdir -p public
+          curl -fsSL "https://soulrx.vercel.app/og.png" -o public/og.png
+          python3 - <<'PY'
+          p = open("public/og.png", "rb").read()
+          assert p[:8] == b"\x89PNG\r\n\x1a\n", p[:8]
+          print("ok", len(p))
+          PY
       - name: Commit and push
         run: |
           git config user.name "sosmos3218-bot"
