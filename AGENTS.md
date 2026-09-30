@@ -1,14 +1,9 @@
 <!-- BEGIN:nextjs-agent-rules -->
-# This is NOT a guide for how to build the site. Use it for Next.js and the patterns found in this codebase.
 
-# Next.js: ALWAYS read docs before coding
+# This is NOT the Next.js you know
 
-Before writing or changing Next.js / React / TypeScript code in this repo, you MUST open and follow the relevant official docs. Do not rely on training data alone.
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
-Required references:
-- https://nextjs.org/docs
-- App Router, Server vs Client Components, routing, layouts, loading/error UI
-- Data fetching, caching, revalidation, and route handlers as needed for the task
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
-If docs and this repo disagree, prefer the official docs for current Next.js behavior.
 <!-- END:nextjs-agent-rules -->
