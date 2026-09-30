@@ -39,7 +39,7 @@ export default function HomePage() {
           <span className="font-medium text-stone-700">말씀 처방</span>
         </p>
         <p className="mt-2 text-xs leading-relaxed text-stone-500">
-          점술이 아닙니다. 마음에 가까운 감정을 고르면
+          마음에 가까운 감정을 고르면
           <br />
           구절·묵상·기도가 따라오는 짧은 큐티예요.
         </p>
@@ -85,9 +85,9 @@ export default function HomePage() {
       <DailyReminder />
 
       <p className="mt-6 text-center text-[11px] leading-relaxed text-stone-400">
-        운세·예언이 아닙니다.
+        말씀 앞에서 오늘의 마음을 살피고
         <br />
-        말씀 앞에서 마음을 살피는 짧은 큐티예요.
+        작은 걸음을 내딛는 짧은 큐티예요.
       </p>
     </main>
   );
