@@ -49,7 +49,7 @@ export default function PricingPage() {
           월간 구독
         </p>
         <p className="mb-4 text-center font-serif text-3xl font-bold text-stone-800">
-          ₩4,900
+          ₩3,900
           <span className="text-base font-medium text-stone-400">/월</span>
         </p>
         <ul className="mb-6 space-y-2 text-sm text-stone-600">
@@ -76,7 +76,7 @@ export default function PricingPage() {
             disabled={busy}
             className="w-full rounded-xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-60"
           >
-            {busy ? "결제 페이지로 이동 중…" : "월 ₩4,900으로 무제한"}
+            {busy ? "결제 페이지로 이동 중…" : "월 ₩3,900으로 무제한"}
           </button>
         ) : (
           <Link

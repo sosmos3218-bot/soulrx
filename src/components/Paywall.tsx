@@ -58,14 +58,14 @@ export function Paywall() {
           disabled={busy}
           className="mb-3 w-full rounded-xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 disabled:opacity-60"
         >
-          {busy ? "결제 페이지로 이동 중…" : "월 ₩4,900으로 무제한"}
+          {busy ? "결제 페이지로 이동 중…" : "월 ₩3,900으로 무제한"}
         </button>
       ) : (
         <Link
           href={`/sign-in?redirect_url=${encodeURIComponent("/pricing")}`}
           className="mb-3 block w-full rounded-xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-sky-700"
         >
-          월 ₩4,900으로 무제한
+          월 ₩3,900으로 무제한
         </Link>
       )}
 
@@ -89,7 +89,7 @@ export function Paywall() {
         </Link>
         <Link
           href="/"
-          className="w-full rounded-xl px-4 py-3 text-center text-sm font-medium text-stone-500 hover:text-stone-700"
+          className="w-full rounded-xl px-4 py-3 text-sm font-medium text-stone-500 hover:text-stone-700"
         >
           홈으로
         </Link>

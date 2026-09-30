@@ -46,7 +46,7 @@ export async function POST() {
         quantity: 1,
         price_data: {
           currency: "krw",
-          unit_amount: 4900,
+          unit_amount: 3900,
           recurring: { interval: "month" },
           product_data: {
             name: "SoulRx 무제한",
