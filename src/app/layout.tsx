@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
+import { koKR } from "@clerk/localizations";
 import "./globals.css";
 import { BottomNav } from "@/components/BottomNav";
+import { AuthControls } from "@/components/AuthControls";
 
 const sans = Noto_Sans_KR({
   variable: "--font-sans",
@@ -32,13 +35,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${sans.variable} ${serif.variable} h-full`}>
-      <body className="min-h-full bg-[#faf7f2] text-stone-800 antialiased">
-        <div className="mx-auto min-h-full max-w-md px-4 pb-24 pt-8">
-          {children}
-        </div>
-        <BottomNav />
-      </body>
-    </html>
+    <ClerkProvider
+      localization={koKR}
+      appearance={{
+        variables: {
+          colorPrimary: "#0284c7",
+          colorBackground: "#faf7f2",
+          borderRadius: "0.75rem",
+        },
+      }}
+    >
+      <html lang="ko" className={`${sans.variable} ${serif.variable} h-full`}>
+        <body className="min-h-full bg-[#faf7f2] text-stone-800 antialiased">
+          <div className="mx-auto min-h-full max-w-md px-4 pb-24 pt-8">
+            <AuthControls />
+            {children}
+          </div>
+          <BottomNav />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
