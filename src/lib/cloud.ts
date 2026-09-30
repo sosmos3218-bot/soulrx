@@ -123,9 +123,21 @@ export async function persistHistoryEntry(
   }
 }
 
+export async function fetchSubscriptionActive(): Promise<boolean> {
+  try {
+    const res = await fetch("/api/subscription");
+    if (!res.ok) return false;
+    const data = (await res.json()) as { active?: boolean };
+    return !!data.active;
+  } catch {
+    return false;
+  }
+}
+
 export async function checkCanView(signedIn: boolean): Promise<boolean> {
   if (!signedIn) return canViewLocal();
   try {
+    if (await fetchSubscriptionActive()) return true;
     const daily = await fetchCloudDaily();
     const today = seoulDate();
     if (daily.date !== today) return true;
@@ -138,6 +150,11 @@ export async function checkCanView(signedIn: boolean): Promise<boolean> {
 export async function recordView(signedIn: boolean): Promise<DailyLimit> {
   if (!signedIn) return recordLocalView();
   try {
+    // Subscribers do not consume the free daily quota
+    if (await fetchSubscriptionActive()) {
+      const daily = await fetchCloudDaily();
+      return daily;
+    }
     const next = await incrementCloudDaily();
     localStorage.setItem(DAILY_KEY, JSON.stringify(next));
     return next;
