@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { EMOTIONS, EMOTION_SLUG, type Emotion } from "@/lib/types";
+import { Suspense } from "react";
 import { Onboarding } from "@/components/Onboarding";
+import { CheckoutReturn } from "@/components/CheckoutReturn";
 
 const emoji: Record<Emotion, string> = {
   기쁨: "😊",
@@ -16,6 +18,9 @@ const emoji: Record<Emotion, string> = {
 export default function HomePage() {
   return (
     <main>
+      <Suspense fallback={null}>
+        <CheckoutReturn />
+      </Suspense>
       <Onboarding />
       <header className="mb-8 text-center">
         <p className="mb-1 text-xs font-semibold tracking-[0.2em] text-sky-600">

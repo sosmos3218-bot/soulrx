@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, SignInButton } from "@clerk/nextjs";
 import { loadHistory } from "@/lib/cloud";
 import type { HistoryEntry } from "@/lib/types";
 import { formatKoreanDate } from "@/lib/date";
@@ -50,13 +50,31 @@ export default function HistoryPage() {
             오늘의 감정을 고르고 처방을 받은 뒤
             <br />
             「기록 남기기」를 누르면 여기에 쌓여요.
+            {!isSignedIn && (
+              <>
+                <br />
+                로그인하면 클라우드에 안전하게 남겨 둘 수 있어요.
+              </>
+            )}
           </p>
-          <Link
-            href="/"
-            className="inline-block rounded-xl bg-sky-600 px-5 py-3 text-sm font-medium text-white hover:bg-sky-700"
-          >
-            첫 처방 받으러 가기
-          </Link>
+          <div className="flex flex-col items-center gap-2">
+            <Link
+              href="/"
+              className="inline-block rounded-xl bg-sky-600 px-5 py-3 text-sm font-medium text-white hover:bg-sky-700"
+            >
+              첫 처방 받으러 가기
+            </Link>
+            {!isSignedIn && (
+              <SignInButton mode="redirect" forceRedirectUrl="/history">
+                <button
+                  type="button"
+                  className="rounded-xl px-4 py-2 text-sm font-medium text-sky-700 hover:text-sky-800"
+                >
+                  로그인하고 클라우드 동기화
+                </button>
+              </SignInButton>
+            )}
+          </div>
         </div>
       ) : (
         <ul className="space-y-3">
