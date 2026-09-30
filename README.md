@@ -1,32 +1,33 @@
 # SoulRx
 
-감정 처방전 — 오늘의 마음에 맞는 성경 구절을 처방합니다.
+감정에 처방을 내리는 따뜻한 웹앱.
 
 ## Stack
 
-- Next.js 16 (App Router) + TypeScript + Tailwind CSS
-- Clerk 인증 (`/sign-in`, `/sign-up`)
-- Neon Postgres — 로그인 사용자 히스토리·일일 한도 클라우드 동기화
-- 비로그인 사용자는 localStorage 폴백
+- Next.js (App Router)
+- Clerk (auth)
+- Neon (Postgres history)
+- Stripe (monthly subscription)
+- Vercel
 
-## Local setup
+## Local
 
 ```bash
 npm install
-# .env.local 에 Clerk + DATABASE_URL 설정 (커밋하지 않음)
 npm run dev
 ```
 
-## Env (Vercel / local)
+Copy `.env.local` with:
 
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
 - `CLERK_SECRET_KEY`
-- `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in`
-- `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up`
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL` / `NEXT_PUBLIC_CLERK_SIGN_UP_URL`
 - `DATABASE_URL` (Neon)
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `NEXT_PUBLIC_APP_URL` (e.g. `http://localhost:3000`)
 
-Do not commit secrets.
+## Production
 
-## Deploy
-
-Production: https://soulrx.vercel.app
+https://soulrx.vercel.app
