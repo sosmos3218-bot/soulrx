@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR, Noto_Serif_KR } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { koKR } from "@clerk/localizations";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { BottomNav } from "@/components/BottomNav";
 import { AuthControls } from "@/components/AuthControls";
@@ -52,6 +54,8 @@ export default function RootLayout({
             {children}
           </div>
           <BottomNav />
+          <Analytics />
+          <SpeedInsights />
         </body>
       </html>
     </ClerkProvider>
