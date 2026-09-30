@@ -3,15 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { getPrescription } from "@/data/prescriptions";
 import {
   SLUG_TO_EMOTION,
   SLUG_TO_SITUATION,
 } from "@/lib/types";
-import {
-  canViewPrescription,
-  recordPrescriptionView,
-} from "@/lib/storage";
+import { checkCanView, recordView } from "@/lib/cloud";
 import { seoulDate } from "@/lib/date";
 import { PrescriptionView } from "@/components/PrescriptionView";
 import { Paywall } from "@/components/Paywall";
@@ -20,6 +18,7 @@ type Gate = "loading" | "ok" | "paywall" | "missing";
 
 export default function RxPage() {
   const params = useParams<{ emotion: string; situation: string }>();
+  const { isLoaded, isSignedIn } = useAuth();
   const emotion = SLUG_TO_EMOTION[params.emotion];
   const situation = SLUG_TO_SITUATION[params.situation];
   const rx =
@@ -28,28 +27,40 @@ export default function RxPage() {
   const [gate, setGate] = useState<Gate>("loading");
 
   useEffect(() => {
+    if (!isLoaded) return;
     if (!rx) {
       setGate("missing");
       return;
     }
-    // Session key so refresh of same prescription doesn't re-count
-    const viewKey = `soulrx_viewed_${rx.emotion}_${rx.situation}_${seoulDate()}`;
-    const alreadyThisSession = sessionStorage.getItem(viewKey) === "1";
 
-    if (alreadyThisSession) {
+    let cancelled = false;
+    (async () => {
+      const viewKey = `soulrx_viewed_${rx.emotion}_${rx.situation}_${seoulDate()}`;
+      const alreadyThisSession = sessionStorage.getItem(viewKey) === "1";
+
+      if (alreadyThisSession) {
+        if (!cancelled) setGate("ok");
+        return;
+      }
+
+      const can = await checkCanView(!!isSignedIn);
+      if (cancelled) return;
+
+      if (!can) {
+        setGate("paywall");
+        return;
+      }
+
+      await recordView(!!isSignedIn);
+      if (cancelled) return;
+      sessionStorage.setItem(viewKey, "1");
       setGate("ok");
-      return;
-    }
+    })();
 
-    if (!canViewPrescription()) {
-      setGate("paywall");
-      return;
-    }
-
-    recordPrescriptionView();
-    sessionStorage.setItem(viewKey, "1");
-    setGate("ok");
-  }, [rx]);
+    return () => {
+      cancelled = true;
+    };
+  }, [rx, isLoaded, isSignedIn]);
 
   if (gate === "loading") {
     return (

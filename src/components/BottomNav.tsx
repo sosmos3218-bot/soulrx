@@ -10,6 +10,11 @@ const links = [
 
 export function BottomNav() {
   const pathname = usePathname();
+
+  if (pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up")) {
+    return null;
+  }
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-stone-200/80 bg-[#faf7f2]/95 backdrop-blur">
       <div className="mx-auto flex max-w-md">

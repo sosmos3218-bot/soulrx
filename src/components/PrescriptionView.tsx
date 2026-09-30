@@ -3,12 +3,14 @@
 import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
 import { toPng } from "html-to-image";
+import { useAuth } from "@clerk/nextjs";
 import type { Prescription } from "@/lib/types";
 import { Chip } from "./Chip";
-import { saveHistoryEntry } from "@/lib/storage";
+import { persistHistoryEntry } from "@/lib/cloud";
 
 export function PrescriptionView({ rx }: { rx: Prescription }) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const { isSignedIn } = useAuth();
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -28,7 +30,6 @@ export function PrescriptionView({ rx }: { rx: Prescription }) {
       a.click();
       setSavedMsg("이미지를 저장했어요");
     } catch {
-      // Fallback: copy verse + prayer
       const text = `${rx.verseRef}\n${rx.verse}\n\n${rx.prayer}`;
       try {
         await navigator.clipboard.writeText(text);
@@ -41,14 +42,24 @@ export function PrescriptionView({ rx }: { rx: Prescription }) {
     }
   }, [rx]);
 
-  const onRecord = useCallback(() => {
-    saveHistoryEntry({
-      emotion: rx.emotion,
-      situation: rx.situation,
-      verseRef: rx.verseRef,
-    });
-    setSavedMsg("기록에 남겼어요");
-  }, [rx]);
+  const onRecord = useCallback(async () => {
+    setBusy(true);
+    setSavedMsg(null);
+    try {
+      await persistHistoryEntry(!!isSignedIn, {
+        emotion: rx.emotion,
+        situation: rx.situation,
+        verseRef: rx.verseRef,
+      });
+      setSavedMsg(
+        isSignedIn ? "클라우드 기록에 남겼어요" : "기록에 남겼어요"
+      );
+    } catch {
+      setSavedMsg("기록 저장에 실패했어요");
+    } finally {
+      setBusy(false);
+    }
+  }, [rx, isSignedIn]);
 
   return (
     <div className="space-y-4 pb-4">
@@ -124,7 +135,8 @@ export function PrescriptionView({ rx }: { rx: Prescription }) {
         <button
           type="button"
           onClick={onRecord}
-          className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-stone-700 hover:bg-stone-50"
+          disabled={busy}
+          className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60"
         >
           기록 남기기
         </button>
