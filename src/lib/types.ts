@@ -68,14 +68,14 @@ export interface Prescription {
 
 export interface HistoryEntry {
   id: string;
-  date: string;
+  date: string; // Asia/Seoul YYYY-MM-DD
   emotion: Emotion;
   situation: Situation;
   verseRef: string;
-  savedAt: string;
+  savedAt: string; // ISO
 }
 
 export interface DailyLimit {
-  date: string;
+  date: string; // Asia/Seoul YYYY-MM-DD
   count: number;
 }

@@ -2,17 +2,28 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getHistory } from "@/lib/storage";
+import { useAuth } from "@clerk/nextjs";
+import { loadHistory } from "@/lib/cloud";
 import type { HistoryEntry } from "@/lib/types";
 import { formatKoreanDate } from "@/lib/date";
 import { Chip } from "@/components/Chip";
+import { SyncPrompt } from "@/components/SyncPrompt";
 
 export default function HistoryPage() {
+  const { isLoaded, isSignedIn } = useAuth();
   const [entries, setEntries] = useState<HistoryEntry[] | null>(null);
 
   useEffect(() => {
-    setEntries(getHistory());
-  }, []);
+    if (!isLoaded) return;
+    let cancelled = false;
+    (async () => {
+      const list = await loadHistory(!!isSignedIn);
+      if (!cancelled) setEntries(list);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn]);
 
   return (
     <main>
@@ -20,8 +31,13 @@ export default function HistoryPage() {
         <h1 className="mb-1 font-serif text-2xl font-bold text-stone-800">
           기록
         </h1>
-        <p className="text-sm text-stone-500">최근 7일</p>
+        <p className="text-sm text-stone-500">
+          최근 7일
+          {isSignedIn ? " · 클라우드" : " · 이 기기"}
+        </p>
       </header>
+
+      <SyncPrompt />
 
       {entries === null ? (
         <p className="text-center text-sm text-stone-400">불러오는 중…</p>

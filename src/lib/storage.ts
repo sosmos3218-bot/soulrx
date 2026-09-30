@@ -44,6 +44,8 @@ export function getHistory(): HistoryEntry[] {
     const raw = localStorage.getItem(HISTORY_KEY);
     if (!raw) return [];
     const list = JSON.parse(raw) as HistoryEntry[];
+    const cutoff = new Date();
+    // Keep last 7 Seoul calendar days
     const today = seoulDate();
     const [y, m, d] = today.split("-").map(Number);
     const keep = new Set<string>();
@@ -57,6 +59,7 @@ export function getHistory(): HistoryEntry[] {
       }).format(dt);
       keep.add(key);
     }
+    void cutoff;
     return list.filter((e) => keep.has(e.date));
   } catch {
     return [];
