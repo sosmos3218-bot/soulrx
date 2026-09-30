@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth, SignInButton } from "@clerk/nextjs";
 import { loadHistory } from "@/lib/cloud";
 import type { HistoryEntry } from "@/lib/types";
 import { formatKoreanDate } from "@/lib/date";
+import { computeWeeklyInsight } from "@/lib/insights";
 import { Chip } from "@/components/Chip";
 import { SyncPrompt } from "@/components/SyncPrompt";
 
@@ -24,6 +25,11 @@ export default function HistoryPage() {
       cancelled = true;
     };
   }, [isLoaded, isSignedIn]);
+
+  const insight = useMemo(
+    () => (entries && entries.length > 0 ? computeWeeklyInsight(entries) : null),
+    [entries]
+  );
 
   return (
     <main>
@@ -77,23 +83,56 @@ export default function HistoryPage() {
           </div>
         </div>
       ) : (
-        <ul className="space-y-3">
-          {entries.map((e) => (
-            <li
-              key={e.id}
-              className="rounded-2xl border border-stone-200 bg-white/80 px-4 py-3 shadow-sm"
+        <>
+          {insight && insight.count > 0 && (
+            <section
+              aria-label="이번 주 돌아보기"
+              className="mb-5 rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50/90 to-stone-50/80 px-5 py-4 shadow-sm"
             >
-              <p className="mb-2 text-xs text-stone-400">
-                {formatKoreanDate(e.date)}
+              <p className="mb-3 text-xs font-semibold tracking-wide text-amber-800/80">
+                이번 주 돌아보기
               </p>
-              <div className="mb-2 flex flex-wrap gap-2">
-                <Chip>{e.emotion}</Chip>
-                <Chip tone="sky">{e.situation}</Chip>
-              </div>
-              <p className="font-serif text-sm text-stone-700">{e.verseRef}</p>
-            </li>
-          ))}
-        </ul>
+              <p className="mb-3 text-sm text-stone-700">
+                최근 7일 처방{" "}
+                <span className="font-semibold text-stone-800">
+                  {insight.count}회
+                </span>
+              </p>
+              {(insight.topEmotion || insight.topSituation) && (
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-stone-500">가장 자주</span>
+                  {insight.topEmotion && <Chip>{insight.topEmotion}</Chip>}
+                  {insight.topSituation && (
+                    <Chip tone="sky">{insight.topSituation}</Chip>
+                  )}
+                </div>
+              )}
+              {insight.pastoralLine && (
+                <p className="break-keep font-serif text-sm leading-relaxed text-stone-700">
+                  {insight.pastoralLine}
+                </p>
+              )}
+            </section>
+          )}
+
+          <ul className="space-y-3">
+            {entries.map((e) => (
+              <li
+                key={e.id}
+                className="rounded-2xl border border-stone-200 bg-white/80 px-4 py-3 shadow-sm"
+              >
+                <p className="mb-2 text-xs text-stone-400">
+                  {formatKoreanDate(e.date)}
+                </p>
+                <div className="mb-2 flex flex-wrap gap-2">
+                  <Chip>{e.emotion}</Chip>
+                  <Chip tone="sky">{e.situation}</Chip>
+                </div>
+                <p className="font-serif text-sm text-stone-700">{e.verseRef}</p>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </main>
   );
