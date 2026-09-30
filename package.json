@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "prebuild": "node scripts/write-og-png.mjs"
+    "lint": "eslint"
   },
   "dependencies": {
     "@clerk/localizations": "^4.21.0",
