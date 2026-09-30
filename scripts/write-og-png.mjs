@@ -7,6 +7,20 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const partsDir = path.join(__dirname, "og-parts");
 const out = path.join(__dirname, "..", "public", "og.png");
 
+// Prefer an already-committed real PNG (do not overwrite).
+if (fs.existsSync(out)) {
+  const existing = fs.readFileSync(out);
+  if (existing[0] === 0x89 && existing[1] === 0x50) {
+    console.log("public/og.png already present", existing.length);
+    process.exit(0);
+  }
+}
+
+if (!fs.existsSync(partsDir)) {
+  console.error("No og-parts dir and no valid public/og.png");
+  process.exit(1);
+}
+
 const files = fs
   .readdirSync(partsDir)
   .filter((f) => f.endsWith(".b64"))
