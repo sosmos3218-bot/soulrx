@@ -9,17 +9,17 @@ import { Chip } from "./Chip";
 import { persistHistoryEntry } from "@/lib/cloud";
 
 export function PrescriptionView({ rx }: { rx: Prescription }) {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const shareRef = useRef<HTMLDivElement>(null);
   const { isSignedIn } = useAuth();
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const onSaveImage = useCallback(async () => {
-    if (!cardRef.current) return;
+    if (!shareRef.current) return;
     setBusy(true);
     setSavedMsg(null);
     try {
-      const dataUrl = await toPng(cardRef.current, {
+      const dataUrl = await toPng(shareRef.current, {
         cacheBust: true,
         pixelRatio: 2,
         backgroundColor: "#faf7f2",
@@ -30,7 +30,7 @@ export function PrescriptionView({ rx }: { rx: Prescription }) {
       a.click();
       setSavedMsg("이미지를 저장했어요");
     } catch {
-      const text = `${rx.verseRef}\n${rx.verse}\n\n${rx.prayer}`;
+      const text = `${rx.verseRef}\n${rx.verse}\n\n${rx.prayer}\n\n— SoulRx`;
       try {
         await navigator.clipboard.writeText(text);
         setSavedMsg("이미지 저장에 실패해 말씀·기도를 복사했어요");
@@ -52,7 +52,9 @@ export function PrescriptionView({ rx }: { rx: Prescription }) {
         verseRef: rx.verseRef,
       });
       setSavedMsg(
-        isSignedIn ? "클라우드 기록에 남겼어요" : "기록에 남겼어요"
+        isSignedIn
+          ? "클라우드 기록에 남겼어요"
+          : "이 기기에 남겼어요 · 로그인하면 클라우드에 동기화할 수 있어요"
       );
     } catch {
       setSavedMsg("기록 저장에 실패했어요");
@@ -63,10 +65,8 @@ export function PrescriptionView({ rx }: { rx: Prescription }) {
 
   return (
     <div className="space-y-4 pb-4">
-      <div
-        ref={cardRef}
-        className="rounded-2xl border border-stone-200 bg-[#faf7f2] px-6 py-7 shadow-sm"
-      >
+      {/* Full reading card */}
+      <div className="rounded-2xl border border-stone-200 bg-[#faf7f2] px-6 py-7 shadow-sm">
         <div className="mb-4 flex flex-wrap gap-2">
           <Chip>{rx.emotion}</Chip>
           <Chip tone="sky">{rx.situation}</Chip>
@@ -115,6 +115,155 @@ export function PrescriptionView({ rx }: { rx: Prescription }) {
             {rx.prayer}
           </p>
         </section>
+      </div>
+
+      {/* Share-optimized card (captured by html-to-image) */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed left-[-9999px] top-0"
+      >
+        <div
+          ref={shareRef}
+          style={{
+            width: 540,
+            padding: "40px 36px 32px",
+            backgroundColor: "#faf7f2",
+            borderRadius: 24,
+            border: "1px solid #e7e5e4",
+            fontFamily:
+              'ui-serif, Georgia, "Noto Serif KR", "Apple Myungjo", serif',
+            color: "#292524",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              marginBottom: 20,
+              flexWrap: "wrap",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-flex",
+                borderRadius: 999,
+                border: "1px solid #fde68a",
+                background: "#fffbeb",
+                color: "#78350f",
+                fontSize: 13,
+                fontWeight: 600,
+                padding: "4px 12px",
+                fontFamily: "system-ui, sans-serif",
+              }}
+            >
+              {rx.emotion}
+            </span>
+            <span
+              style={{
+                display: "inline-flex",
+                borderRadius: 999,
+                border: "1px solid #bae6fd",
+                background: "#e0f2fe",
+                color: "#075985",
+                fontSize: 13,
+                fontWeight: 600,
+                padding: "4px 12px",
+                fontFamily: "system-ui, sans-serif",
+              }}
+            >
+              {rx.situation}
+            </span>
+          </div>
+
+          <p
+            style={{
+              margin: "0 0 8px",
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              color: "#0369a1",
+              fontFamily: "system-ui, sans-serif",
+            }}
+          >
+            {rx.verseRef}
+          </p>
+          <p
+            style={{
+              margin: "0 0 24px",
+              fontSize: 18,
+              lineHeight: 1.75,
+              wordBreak: "keep-all",
+              color: "#1c1917",
+            }}
+          >
+            {rx.verse}
+          </p>
+
+          <div
+            style={{
+              borderRadius: 16,
+              background: "rgba(240, 249, 255, 0.85)",
+              padding: "16px 18px",
+              marginBottom: 28,
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 6px",
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#a8a29e",
+                fontFamily: "system-ui, sans-serif",
+              }}
+            >
+              짧은 기도
+            </p>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 14,
+                lineHeight: 1.7,
+                wordBreak: "keep-all",
+                color: "#292524",
+              }}
+            >
+              {rx.prayer}
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderTop: "1px solid #e7e5e4",
+              paddingTop: 16,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: "0.18em",
+                color: "#0284c7",
+                fontFamily: "system-ui, sans-serif",
+              }}
+            >
+              SoulRx
+            </span>
+            <span
+              style={{
+                fontSize: 11,
+                color: "#a8a29e",
+                fontFamily: "system-ui, sans-serif",
+              }}
+            >
+              마음을 살피는 말씀 처방
+            </span>
+          </div>
+        </div>
       </div>
 
       {savedMsg && (
