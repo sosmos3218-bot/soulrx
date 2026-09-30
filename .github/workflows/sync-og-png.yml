@@ -1,0 +1,31 @@
+name: Sync OG PNG
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download OG from production
+        run: curl -fsSL -o public/og.png "https://soulrx.vercel.app/og.png"
+      - name: Verify PNG
+        run: |
+          test -s public/og.png
+          python3 - <<'PY'
+          p=open("public/og.png","rb").read(8)
+          assert p[:8]==b"\x89PNG\r\n\x1a\n", p[:8]
+          print("ok", __import__("os").path.getsize("public/og.png"))
+          PY
+      - name: Commit and push
+        run: |
+          git config user.name "sosmos3218-bot"
+          git config user.email "sosmos3218@gmail.com"
+          git add public/og.png
+          if git diff --cached --quiet; then
+            echo "og.png already up to date"
+            exit 0
+          fi
+          git commit -m "Add public/og.png for Open Graph"
+          git push
