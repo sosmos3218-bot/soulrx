@@ -1,6 +1,6 @@
 # SoulRx
 
-그리스도 친화적 감정 처방 큐티 MVP.
+기독교 친화적 감정 처방 큐티 MVP.
 
 - 라이브: https://soulrx.vercel.app
 - 레포: https://github.com/sosmos3218-bot/soulrx
