@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { getAppUrl } from "@/lib/app-url";
+import { PLANS, TRIAL_DAYS, parsePlan, type PlanId } from "@/lib/plans";
 import { getStripe } from "@/lib/stripe";
 import { getSubscriptionRow } from "@/lib/subscription";
 
@@ -13,11 +14,29 @@ function randomSuffix(len = 8): string {
   return out;
 }
 
-export async function POST() {
+async function resolvePlan(req: Request): Promise<PlanId> {
+  const url = new URL(req.url);
+  const fromQuery = url.searchParams.get("plan");
+  if (fromQuery === "monthly" || fromQuery === "annual") {
+    return fromQuery;
+  }
+
+  try {
+    const body = (await req.json()) as { plan?: unknown };
+    return parsePlan(body?.plan);
+  } catch {
+    return "monthly";
+  }
+}
+
+export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const plan = await resolvePlan(req);
+  const planConfig = PLANS[plan];
 
   const stripe = getStripe();
   const appUrl = await getAppUrl();
@@ -37,20 +56,21 @@ export async function POST() {
     client_reference_id: userId,
     customer: customerId,
     customer_email: customerId ? undefined : email,
-    metadata: { userId },
+    metadata: { userId, plan },
     subscription_data: {
-      metadata: { userId },
+      trial_period_days: TRIAL_DAYS,
+      metadata: { userId, plan },
     },
     line_items: [
       {
         quantity: 1,
         price_data: {
           currency: "krw",
-          unit_amount: 3900,
-          recurring: { interval: "month" },
+          unit_amount: planConfig.unitAmount,
+          recurring: { interval: planConfig.interval },
           product_data: {
-            name: "SoulRx 무제한",
-            description: "하루 처방 횟수 제한 없이 말씀 처방을 이용합니다.",
+            name: planConfig.productName,
+            description: planConfig.productDescription,
           },
         },
       },
@@ -68,5 +88,9 @@ export async function POST() {
     );
   }
 
-  return NextResponse.json({ url: session.url, sessionId: session.id });
+  return NextResponse.json({
+    url: session.url,
+    sessionId: session.id,
+    plan,
+  });
 }
