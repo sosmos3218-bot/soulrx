@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "prebuild": "node scripts/write-og-png.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prebuild": "node scripts/generate-pwa-icons.cjs",
+    "generate:icons": "node scripts/generate-pwa-icons.cjs"
   },
   "dependencies": {
     "@clerk/localizations": "^4.21.0",
