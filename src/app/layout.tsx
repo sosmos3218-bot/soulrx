@@ -7,6 +7,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { BottomNav } from "@/components/BottomNav";
 import { AuthControls } from "@/components/AuthControls";
+import { PwaRegister } from "@/components/PwaRegister";
+import { InstallPrompt } from "@/components/InstallPrompt";
 
 const sans = Noto_Sans_KR({
   variable: "--font-sans",
@@ -36,6 +38,25 @@ export const metadata: Metadata = {
   },
   description,
   applicationName: "SoulRx",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SoulRx",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
   openGraph: {
     type: "website",
     locale: "ko_KR",
@@ -64,6 +85,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#faf7f2",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -89,6 +111,8 @@ export default function RootLayout({
             {children}
           </div>
           <BottomNav />
+          <InstallPrompt />
+          <PwaRegister />
           <Analytics />
           <SpeedInsights />
         </body>
