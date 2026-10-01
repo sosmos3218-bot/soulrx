@@ -1,0 +1,40 @@
+{
+  "name": "SoulRx",
+  "short_name": "SoulRx",
+  "description": "감정 → 상황 → 말씀 처방. 조용한 그리스도인 자기 성찰 큐티.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#faf7f2",
+  "theme_color": "#faf7f2",
+  "lang": "ko",
+  "dir": "ltr",
+  "categories": ["lifestyle", "health"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
