@@ -5,8 +5,10 @@ import {
   clearReminder,
   formatReminderTime,
   getReminderAt,
+  isRunningAsPwa,
   maybeFireDueReminder,
   notificationSupported,
+  requestNotificationPermission,
   scheduleTomorrowReminder,
 } from "@/lib/reminder";
 
@@ -17,8 +19,10 @@ export function DailyReminder({ compact = false }: { compact?: boolean }) {
   const [atLabel, setAtLabel] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [asPwa, setAsPwa] = useState(false);
 
   const sync = useCallback(() => {
+    setAsPwa(isRunningAsPwa());
     if (!notificationSupported()) {
       setStatus("unsupported");
       return;
@@ -65,20 +69,23 @@ export function DailyReminder({ compact = false }: { compact?: boolean }) {
         setStatus("unsupported");
         return;
       }
-      let perm = Notification.permission;
-      if (perm === "default") {
-        perm = await Notification.requestPermission();
-      }
+      const perm = await requestNotificationPermission();
       if (perm !== "granted") {
         setStatus("denied");
-        setMsg("알림을 허용해 주시면 브라우저에서 리마인드를 보낼 수 있어요.");
+        setMsg(
+          asPwa
+            ? "홈 화면 앱 설정에서 알림을 허용해 주세요. (기기 설정 → SoulRx)"
+            : "알림을 허용해 주시면 리마인드를 보낼 수 있어요."
+        );
         return;
       }
       const iso = scheduleTomorrowReminder();
       setStatus("scheduled");
       setAtLabel(formatReminderTime(iso));
       setMsg(
-        "내일 이 시간에 알림을 예약했어요. 브라우저가 열려 있고 알림이 허용된 경우에만 동작해요."
+        asPwa
+          ? "내일 이 시간에 알림을 예약했어요. 홈 화면 앱을 가끔 열어 두면 더 잘 동작해요. (서버 푸시는 아직 없어요)"
+          : "내일 이 시간에 알림을 예약했어요. 홈 화면에 추가해 두면 알림이 더 안정적이에요. 탭이 열려 있을 때 동작합니다."
       );
     } finally {
       setBusy(false);
@@ -104,6 +111,7 @@ export function DailyReminder({ compact = false }: { compact?: boolean }) {
       >
         <p className="text-xs leading-relaxed text-stone-400">
           이 브라우저는 알림을 지원하지 않아 리마인드를 쓸 수 없어요.
+          {asPwa ? "" : " Chrome/Android나 홈 화면 앱에서 다시 시도해 보세요."}
         </p>
       </section>
     );
@@ -120,13 +128,26 @@ export function DailyReminder({ compact = false }: { compact?: boolean }) {
     >
       <p className="mb-1 text-xs font-semibold tracking-wide text-sky-700/90">
         내일 이 시간에 리마인드
+        {asPwa ? " · 홈 화면 앱" : ""}
       </p>
       <p className="mb-3 text-[11px] leading-relaxed text-stone-500">
-        브라우저 알림으로 가볍게 알려 드려요. 푸시 서버 없이,{" "}
-        <span className="font-medium text-stone-600">
-          탭이 열려 있고 알림 권한이 있을 때
-        </span>
-        만 동작합니다.
+        {asPwa ? (
+          <>
+            설치된 앱에서 브라우저 알림으로 알려 드려요. 서버 푸시가 아니라{" "}
+            <span className="font-medium text-stone-600">
+              앱을 열어 둔 뒤·다시 켰을 때
+            </span>
+            예정 시각이 지났으면 알림이 뜹니다.
+          </>
+        ) : (
+          <>
+            브라우저 알림으로 가볍게 알려 드려요. 푸시 서버 없이,{" "}
+            <span className="font-medium text-stone-600">
+              탭이 열려 있고 알림 권한이 있을 때
+            </span>
+            만 동작합니다. 홈 화면에 추가하면 더 편해요.
+          </>
+        )}
       </p>
 
       {status === "scheduled" && atLabel ? (
